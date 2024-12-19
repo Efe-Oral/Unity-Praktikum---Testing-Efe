@@ -341,7 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f7f2d68499d5a743a5ae0c995d6f1ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  userPrompt: how are you?
+  userPrompt: How is the weather like today?
   whichModel: 0
 --- !u!65 &1477892988
 BoxCollider:
