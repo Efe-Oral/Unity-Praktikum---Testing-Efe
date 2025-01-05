@@ -370,7 +370,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: -0.00000023841858, y: 0.00000029802322, z: -0.000000067055225, w: 1}
-  m_LocalPosition: {x: 0.87, y: 0.9, z: -21.57}
+  m_LocalPosition: {x: -13.44, y: 0.11, z: -10.87}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -438,14 +438,14 @@ MonoBehaviour:
   m_text: I am prompt
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4289882417
-  m_fontColor: {r: 0.19215687, g: 0.41061395, b: 0.69803923, a: 1}
+    rgba: 4281302426
+  m_fontColor: {r: 0.6039216, g: 0.4901961, b: 0.18431373, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -587,7 +587,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 667630d8114cba143ae4383b15541197, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
