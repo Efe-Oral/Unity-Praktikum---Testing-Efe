@@ -3,6 +3,8 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.IO;
 using System;
+using UnityEngine.UI;
+using TMPro;
 
 public class OllamaAPIClient : MonoBehaviour
 {
@@ -15,6 +17,8 @@ public class OllamaAPIClient : MonoBehaviour
     };
 
     public ModelEnum whichModel;
+
+    public TextMeshProUGUI typeWriterEffect;
 
     [System.Serializable]
     public class OllamaRequest
@@ -31,33 +35,38 @@ public class OllamaAPIClient : MonoBehaviour
         }
     }
 
-    // URL for the local Ollama API
-    private string apiUrl = "http://localhost:11434/api/generate";
+    [System.Serializable]
+    public class StreamedChunk
+    {
+        public string model;
+        public string created_at;
+        public string response; // The actual text content
+        public bool done;
+    }
+
+    private string apiUrl = "http://localhost:11434/api/generate"; // URL for the local Ollama API
 
     // Function to start the conversation, sending user input to the Ollama API
     public void StartConversation(string userInput)
     {
         userInput = userPrompt;
-        StartCoroutine(SendToOllama(userInput, ProcessResponse));
+        StartCoroutine(SendToOllama(userInput, ProcessStreamedResponse));
     }
 
     // Coroutine to send a POST request to Ollama's API with the user's input
-    private IEnumerator SendToOllama(string userInput, System.Action<string> callback)
+    private IEnumerator SendToOllama(string userInput, Action<string> callback)
     {
-        // Convert the selected modelEnum to string
         string selectedModel = whichModel.ToString();
 
         // Create an instance of the request payload class
-        OllamaRequest requestData = new OllamaRequest(selectedModel, userInput, false); //final paramater determines "streaming" the response
+        OllamaRequest requestData = new OllamaRequest(selectedModel, userInput, true); // Enable streaming
         Debug.Log("Used model is: " + selectedModel);
 
         // Serialize the request data to JSON
         string jsonData = JsonUtility.ToJson(requestData);
 
-
         // Log the JSON payload to verify it's correct
         Debug.Log("Sending JSON payload: " + jsonData);
-
 
         // Set up the UnityWebRequest
         UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
@@ -66,12 +75,61 @@ public class OllamaAPIClient : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        // Wait for the request to complete
-        yield return request.SendWebRequest();
+        // Send the request
+        request.SendWebRequest();
+
+        string fullResponse = ""; // Holds the full progressive response
+        int lastProcessedIndex = 0; // Tracks the last processed character index
+
+        while (!request.isDone)
+        {
+            // Read the streamed response incrementally
+            string accumulatedData = request.downloadHandler.text;
+
+            // Extract only the new unprocessed part
+            if (accumulatedData.Length > lastProcessedIndex)
+            {
+                string newData = accumulatedData.Substring(lastProcessedIndex);
+                lastProcessedIndex = accumulatedData.Length; // Update the index tracker
+
+                // Process each JSON object in the new data
+                string[] jsonObjects = newData.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string jsonObject in jsonObjects)
+                {
+                    try
+                    {
+                        // Parse the individual JSON object
+                        StreamedChunk streamedChunk = JsonUtility.FromJson<StreamedChunk>(jsonObject);
+
+                        // Append only the new response text
+                        if (!string.IsNullOrEmpty(streamedChunk.response))
+                        {
+                            fullResponse += streamedChunk.response; // Append the new text
+                            typeWriterEffect.text = $"Assistant's Response: {fullResponse.Trim()}"; // Update UI
+                        }
+
+
+                        // Stop streaming if the "done" field is true
+                        if (streamedChunk.done)
+                        {
+                            callback(fullResponse.Trim());
+                            yield break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Error parsing chunk: " + e.Message);
+                    }
+                }
+
+            }
+
+            yield return null; // Wait for the next frame
+        }
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            callback(request.downloadHandler.text);
+            callback(fullResponse.Trim()); // Final full response
         }
         else
         {
@@ -79,45 +137,14 @@ public class OllamaAPIClient : MonoBehaviour
         }
     }
 
-    // Callback function to process the response from Ollama API
-    private void ProcessResponse(string responseText)
+    // Callback to process the full response after streaming is done
+    private void ProcessStreamedResponse(string fullResponse)
     {
-        try
-        {
-            // Parse the JSON response to extract only the "response" field
-            SimpleResponse simpleResponse = JsonUtility.FromJson<SimpleResponse>(responseText);
-
-            if (!string.IsNullOrEmpty(simpleResponse.response))
-            {
-                // Log only the "response" field to the console
-                Debug.Log("Assistant's Response: " + simpleResponse.response);
-
-                // Log to file
-                LogToFile($"Prompt: {userPrompt}\nResponse: {simpleResponse.response}");
-            }
-            else
-            {
-                Debug.LogWarning("No valid response received.");
-                LogToFile($"Prompt: {userPrompt}\nResponse: No valid response received.");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error processing response: " + e.Message);
-        }
+        Debug.Log("Final Full Response: " + fullResponse.Trim());
+        LogToFile($"Prompt: {userPrompt}\nFinal Response: {fullResponse.Trim()}");
     }
 
-    // Class structure to map the JSON response (only includes the "response" field)
-    [System.Serializable]
-    public class SimpleResponse
-    {
-        public string response;
-
-
-    }
-
-
-    // Method to log data to a file on the desktop
+    // Method to log the final response to a file
     private void LogToFile(string logEntry)
     {
         string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -125,33 +152,16 @@ public class OllamaAPIClient : MonoBehaviour
 
         try
         {
-            using (StreamWriter writer = new StreamWriter(filePath, true))
+            using (StreamWriter writer = new StreamWriter(filePath, true)) // Append to file
             {
                 writer.WriteLine(logEntry);
                 writer.WriteLine("Timestamp: " + DateTime.Now);
                 writer.WriteLine("---------------------------");
             }
-            // .txt file where the conversation logged
-            //Debug.Log("Logged to file: " + filePath);
         }
         catch (Exception e)
         {
             Debug.LogError("Failed to log to file: " + e.Message);
         }
-    }
-}
-
-// Class structure to map the JSON response from Ollama API
-[System.Serializable]
-public class OllamaResponse
-{
-    public string id;
-    public string model;
-    public Choice[] choices;
-
-    [System.Serializable]
-    public class Choice
-    {
-        public string text;
     }
 }
