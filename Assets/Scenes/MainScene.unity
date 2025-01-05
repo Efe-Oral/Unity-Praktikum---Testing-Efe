@@ -544,7 +544,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f7f2d68499d5a743a5ae0c995d6f1ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  userPrompt: tell me a knock knock joke
+  userPrompt: write me a short haiku
   whichModel: 0
   typeWriterEffect: {fileID: 1390662831}
 --- !u!65 &1477892988
