@@ -6,11 +6,9 @@ public class TestOllama : MonoBehaviour
 {
     public OllamaAPIClient ollamaAPIClient;
 
-    //public string userInput = "User input here";
-
     void Start()
     {
-        ollamaAPIClient.StartConversation(ollamaAPIClient.userPrompt);
+        // Call the StartConversation method without passing any arguments
+        ollamaAPIClient.StartConversation();
     }
 }
-

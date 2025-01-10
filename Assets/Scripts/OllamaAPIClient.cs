@@ -1,13 +1,15 @@
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
+using TMPro;
 using System.Collections;
 using System.IO;
 using System;
-using UnityEngine.UI;
-using TMPro;
 
 public class OllamaAPIClient : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI inputField; // TextMeshPro InputField for user input
+    [SerializeField] private TextMeshProUGUI typeWriterEffect; // UI TextMeshPro for the typewriter effect
     [SerializeField] public string userPrompt;
 
     public enum ModelEnum
@@ -17,8 +19,6 @@ public class OllamaAPIClient : MonoBehaviour
     };
 
     public ModelEnum whichModel;
-
-    public TextMeshProUGUI typeWriterEffect;
 
     [System.Serializable]
     public class OllamaRequest
@@ -46,11 +46,17 @@ public class OllamaAPIClient : MonoBehaviour
 
     private string apiUrl = "http://localhost:11434/api/generate"; // URL for the local Ollama API
 
-    // Function to start the conversation, sending user input to the Ollama API
-    public void StartConversation(string userInput)
+    // Function to start the conversation with the current input from the InputField
+    public void StartConversation()
     {
-        userInput = userPrompt;
-        StartCoroutine(SendToOllama(userInput, ProcessStreamedResponse));
+        userPrompt = inputField.text; // Get the current text from the input field
+        if (string.IsNullOrEmpty(userPrompt))
+        {
+            Debug.LogWarning("Input field is empty. Please enter a prompt.");
+            return;
+        }
+
+        StartCoroutine(SendToOllama(userPrompt, ProcessStreamedResponse));
     }
 
     // Coroutine to send a POST request to Ollama's API with the user's input
@@ -108,7 +114,6 @@ public class OllamaAPIClient : MonoBehaviour
                             typeWriterEffect.text = $"Assistant's Response: {fullResponse.Trim()}"; // Update UI
                         }
 
-
                         // Stop streaming if the "done" field is true
                         if (streamedChunk.done)
                         {
@@ -121,7 +126,6 @@ public class OllamaAPIClient : MonoBehaviour
                         Debug.LogError("Error parsing chunk: " + e.Message);
                     }
                 }
-
             }
 
             yield return null; // Wait for the next frame
