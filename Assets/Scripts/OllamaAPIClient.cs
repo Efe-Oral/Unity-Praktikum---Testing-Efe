@@ -12,6 +12,8 @@ public class OllamaAPIClient : MonoBehaviour
     [SerializeField] private TextMeshProUGUI typeWriterEffect; // UI TextMeshPro for the typewriter effect
     [SerializeField] public string userPrompt;
 
+    public TestingTextToSpeech textToSpeech; // Reference to the TTS script
+
     public enum ModelEnum
     {
         Llama3,
@@ -146,6 +148,16 @@ public class OllamaAPIClient : MonoBehaviour
     {
         Debug.Log("Final Full Response: " + fullResponse.Trim());
         LogToFile($"Prompt: {userPrompt}\nFinal Response: {fullResponse.Trim()}");
+
+        // Send the final response to the Text-to-Speech system
+        if (textToSpeech != null)
+        {
+            textToSpeech.ReadInputStringAndPlay(fullResponse.Trim());
+        }
+        else
+        {
+            Debug.LogWarning("Text-to-Speech script is not assigned.");
+        }
     }
 
     // Method to log the final response to a file
