@@ -30,12 +30,14 @@ public class OllamaAPIClient : MonoBehaviour
         public string prompt;
         public bool stream;
 
-        public OllamaRequest(string model, string prompt, bool stream)
+        public OllamaRequest(ModelEnum selectedModel, string prompt, bool stream)
         {
-            this.model = model;
+            this.model = GetModelName(selectedModel); // Convert enum to correct model name
             this.prompt = prompt;
             this.stream = stream;
         }
+
+
     }
 
     [System.Serializable]
@@ -65,10 +67,11 @@ public class OllamaAPIClient : MonoBehaviour
     // Coroutine to send a POST request to Ollama's API with the user's input
     private IEnumerator SendToOllama(string userInput, Action<string> callback)
     {
-        string selectedModel = whichModel.ToString();
+        // Get the selected model as a correctly formatted string
+        string selectedModel = GetModelName(whichModel);
 
         // Create an instance of the request payload class
-        OllamaRequest requestData = new OllamaRequest(selectedModel, userInput, true); // Enable streaming
+        OllamaRequest requestData = new OllamaRequest(whichModel, userInput, true); // Enable streaming
         Debug.Log("Used model is: " + selectedModel);
 
         // Serialize the request data to JSON
@@ -179,6 +182,22 @@ public class OllamaAPIClient : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError("Failed to log to file: " + e.Message);
+        }
+    }
+
+    // Get the correct model name based on the selected enum
+    private static string GetModelName(ModelEnum selectedModel)
+    {
+        switch (selectedModel)
+        {
+            case ModelEnum.Llama3:
+                return "llama3";
+            case ModelEnum.Gemma:
+                return "gemma";
+            case ModelEnum.DeepSeek:
+                return "deepseek-r1:1.5b";
+            default:
+                return "llama3"; // Default model
         }
     }
 }
