@@ -18,7 +18,7 @@ public class TestingTextToSpeech : MonoBehaviour
 
     async Task StartAsync(string input)
     {
-        // API key = sk_0bb620868c6f0780f8e6b78ad2981ebc29abdb00036c7edf
+        // Use your API key
         var api = new ElevenLabs.ElevenLabsClient("sk_0bb620868c6f0780f8e6b78ad2981ebc29abdb00036c7edf");
 
         var text = input;
