@@ -17,7 +17,8 @@ public class OllamaAPIClient : MonoBehaviour
     public enum ModelEnum
     {
         Llama3,
-        Gemma
+        Gemma,
+        DeepSeek
     };
 
     public ModelEnum whichModel;
@@ -113,7 +114,7 @@ public class OllamaAPIClient : MonoBehaviour
                         if (!string.IsNullOrEmpty(streamedChunk.response))
                         {
                             fullResponse += streamedChunk.response; // Append the new text
-                            typeWriterEffect.text = $"Assistant's Response: {fullResponse.Trim()}"; // Update UI
+                            typeWriterEffect.text = $"Assistant's Response:\n {fullResponse.Trim()}"; // Update UI
                         }
 
                         // Stop streaming if the "done" field is true
