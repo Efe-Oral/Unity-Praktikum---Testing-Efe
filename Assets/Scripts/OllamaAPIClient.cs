@@ -44,7 +44,6 @@ public class OllamaAPIClient : MonoBehaviour
     public class StreamedChunk
     {
         public string model;
-        public string created_at;
         public string response; // The actual text content
         public bool done;
     }
