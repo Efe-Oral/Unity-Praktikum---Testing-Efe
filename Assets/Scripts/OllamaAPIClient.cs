@@ -54,7 +54,7 @@ public class OllamaAPIClient : MonoBehaviour
     // Function to start the conversation with the current input from the InputField
     public void StartConversation()
     {
-        userPrompt = inputField.text + ". Give a very short answer."; // FOR TESTING, SHORT ANSWERS ONLY
+        userPrompt = inputField.text; // Get the current text from the input field
         if (string.IsNullOrEmpty(userPrompt))
         {
             Debug.LogWarning("Input field is empty. Please enter a prompt.");
