@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System;
 
@@ -196,7 +197,7 @@ public class OllamaAPIClient : MonoBehaviour
             case ModelEnum.DeepSeek:
                 return "deepseek-r1:1.5b";
             default:
-                return "llama3"; // Default model
+                return "deepseek-r1:1.5b"; // Default model
         }
     }
 }
