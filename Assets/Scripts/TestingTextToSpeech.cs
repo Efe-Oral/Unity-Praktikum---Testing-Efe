@@ -26,7 +26,7 @@ public class TestingTextToSpeech : MonoBehaviour
         var text = input;
         var voices = await api.VoicesEndpoint.GetAllVoicesAsync();
 
-        var neuerValue = 0; // Select the first voice in the list
+        var neuerValue = 5; // Select the first voice in the list
         var Stimme = voices[neuerValue];
         Debug.Log($"Selected voice: {Stimme.Name}");
 

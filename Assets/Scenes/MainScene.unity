@@ -1640,7 +1640,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: suggest me 3 short rock band names
+  m_text: who is walt disney?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eef0dac1b5360394a89ad0b0c51718d3, type: 2}
   m_sharedMaterial: {fileID: -8927641949779697358, guid: eef0dac1b5360394a89ad0b0c51718d3, type: 2}
