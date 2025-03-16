@@ -37,8 +37,6 @@ public class OllamaAPIClient : MonoBehaviour
             this.prompt = prompt;
             this.stream = stream;
         }
-
-
     }
 
     [System.Serializable]
@@ -50,6 +48,8 @@ public class OllamaAPIClient : MonoBehaviour
     }
 
     private string apiUrl = "http://localhost:11434/api/generate"; // URL for the local Ollama API
+    private List<string> conversationHistory = new List<string>();
+    private const int maxHistory = 5;
 
     // Function to start the conversation with the current input from the InputField
     public void StartConversation()
@@ -61,7 +61,15 @@ public class OllamaAPIClient : MonoBehaviour
             return;
         }
 
-        StartCoroutine(SendToOllama(userPrompt, ProcessStreamedResponse));
+        // Append new user input to conversation history
+        conversationHistory.Add("User: " + userPrompt);
+        if (conversationHistory.Count > maxHistory)
+        {
+            conversationHistory.RemoveAt(0);
+        }
+
+        string fullContext = string.Join("\n", conversationHistory);
+        StartCoroutine(SendToOllama(fullContext, ProcessStreamedResponse));
     }
 
     // Coroutine to send a POST request to Ollama's API with the user's input
@@ -120,7 +128,7 @@ public class OllamaAPIClient : MonoBehaviour
                             typeWriterEffect.text = $"Assistant's Response:\n {fullResponse.Trim()}"; // Update UI
                         }
 
-                        // Stop streaming if the "done" field is true
+                        // Stop streaming if the "done" filed is true
                         if (streamedChunk.done)
                         {
                             callback(fullResponse.Trim());
@@ -133,7 +141,6 @@ public class OllamaAPIClient : MonoBehaviour
                     }
                 }
             }
-
             yield return null; // Wait for the next frame
         }
 
@@ -152,8 +159,14 @@ public class OllamaAPIClient : MonoBehaviour
     {
         Debug.Log("Final Full Response: " + fullResponse.Trim());
         LogToFile($"Prompt: {userPrompt}\nFinal Response: {fullResponse.Trim()}");
-
         // Send the final response to the Text-to-Speech system
+
+        conversationHistory.Add("Assistant: " + fullResponse.Trim());
+        if (conversationHistory.Count > maxHistory)
+        {
+            conversationHistory.RemoveAt(0);
+        }
+
         if (textToSpeech != null)
         {
             textToSpeech.ReadInputStringAndPlay(fullResponse.Trim());
@@ -164,7 +177,7 @@ public class OllamaAPIClient : MonoBehaviour
         }
     }
 
-    // Method to log the final response to a file
+    // Method to log the final response to a txt file
     private void LogToFile(string logEntry)
     {
         string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -184,7 +197,6 @@ public class OllamaAPIClient : MonoBehaviour
             Debug.LogError("Failed to log to file: " + e.Message);
         }
     }
-
     // Get the correct model name based on the selected enum
     private static string GetModelName(ModelEnum selectedModel)
     {
