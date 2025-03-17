@@ -9,7 +9,7 @@ public class TestingTextToSpeech : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing the audio clip to see if its working
+        // ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing the audio clip to see if its working
     }
 
     // Update is called once per frame
