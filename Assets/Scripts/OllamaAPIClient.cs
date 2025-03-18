@@ -219,7 +219,7 @@ public class OllamaAPIClient : MonoBehaviour
             case ModelEnum.Granite3:
                 return "granite3-moe";
             default:
-                return "deepseek-r1:1.5b"; // Default model is deepseek
+                return "gemma"; // Default model is deepseek
         }
     }
 }
