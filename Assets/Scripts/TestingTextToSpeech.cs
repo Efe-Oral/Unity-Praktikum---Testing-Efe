@@ -9,7 +9,7 @@ public class TestingTextToSpeech : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing the audio clip to see if its working
+        ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing the audio clip to see if its working
     }
 
     // Update is called once per frame
@@ -20,7 +20,7 @@ public class TestingTextToSpeech : MonoBehaviour
     async Task StartAsync(string input)
     {
 
-        var api = new ElevenLabs.ElevenLabsClient("sk_0d477f5af3dbc339e3d12f10d7117618eb21c4bb034333e3");
+        var api = new ElevenLabs.ElevenLabsClient("sk_0bb620868c6f0780f8e6b78ad2981ebc29abdb00036c7edf");
         //Testing API Key:          sk_aa4c68a93ac207564f8c3372555a2a86645190cfbe4aa346
         // Unity Praktikum API Key: sk_0bb620868c6f0780f8e6b78ad2981ebc29abdb00036c7edf
         // Sevi's API:              sk_0d477f5af3dbc339e3d12f10d7117618eb21c4bb034333e3 ✅✅✅ working API
