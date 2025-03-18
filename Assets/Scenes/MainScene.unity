@@ -1305,7 +1305,7 @@ MonoBehaviour:
   typeWriterEffect: {fileID: 1390662831}
   userPrompt: write me a short knock knock joke?
   textToSpeech: {fileID: 10273177}
-  whichModel: 0
+  whichModel: 5
 --- !u!65 &1477892988
 BoxCollider:
   m_ObjectHideFlags: 0

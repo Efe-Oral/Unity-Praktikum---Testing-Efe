@@ -21,7 +21,8 @@ public class OllamaAPIClient : MonoBehaviour
         Gemma,
         DeepSeek,
         Phi3,
-        Qwen2_5
+        Qwen2_5,
+        Granite3
 
     };
 
@@ -215,6 +216,8 @@ public class OllamaAPIClient : MonoBehaviour
                 return "phi3";
             case ModelEnum.Qwen2_5:
                 return "qwen2.5:0.5b";
+            case ModelEnum.Granite3:
+                return "granite3-moe";
             default:
                 return "deepseek-r1:1.5b"; // Default model is deepseek
         }
