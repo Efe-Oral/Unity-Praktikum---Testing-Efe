@@ -11,6 +11,9 @@ public class OllamaAPIClient : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI inputField; // TextMeshPro InputField for user input
     [SerializeField] private TextMeshProUGUI typeWriterEffect; // UI TextMeshPro for the typewriter effect
+    private bool isProcessing = false; // Flag to track if a request is in progress
+    private bool stopProcess = false; // Flag to track if the process should stop
+
     [SerializeField] public string userPrompt;
 
     public TestingTextToSpeech textToSpeech; // Reference to the TTS script
@@ -58,10 +61,19 @@ public class OllamaAPIClient : MonoBehaviour
     // Function to start the conversation with the current input from the InputField
     public void StartConversation()
     {
+        if (isProcessing) // Prevent new prompts while a response is ongoing
+        {
+            Debug.Log("Previous response is still being processed. Please wait...");
+            return;
+        }
+
+        stopProcess = false; // Reset stop flag when starting a new conversation
+        isProcessing = true; // Lock new requests until the current one is complete
+
         userPrompt = inputField.text + ". Give a very short answer."; // For testing purposes only!
         if (string.IsNullOrEmpty(userPrompt))
         {
-            Debug.LogWarning("Input field is empty. Please enter a prompt.");
+            Debug.Log("Input field is empty. Please enter a prompt.");
             return;
         }
 
@@ -73,6 +85,7 @@ public class OllamaAPIClient : MonoBehaviour
         }
 
         string fullContext = string.Join("\n", conversationHistory);
+        // Debug.Log("Prompt sent: " + userPrompt); // Debug to confirm prompt is sent
         StartCoroutine(SendToOllama(fullContext, ProcessStreamedResponse));
     }
 
@@ -161,9 +174,10 @@ public class OllamaAPIClient : MonoBehaviour
     // Callback to process the full response after streaming is done
     private void ProcessStreamedResponse(string fullResponse)
     {
+        if (stopProcess) return; // If stopped, do nothing
+
         Debug.Log("Final Full Response: " + fullResponse.Trim());
         LogToFile($"Prompt: {userPrompt}\nFinal Response: {fullResponse.Trim()}");
-        // Send the final response to the Text-to-Speech system
 
         conversationHistory.Add("Assistant: " + fullResponse.Trim());
         if (conversationHistory.Count > maxHistory)
@@ -177,9 +191,12 @@ public class OllamaAPIClient : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Text-to-Speech script is not assigned.");
+            Debug.Log("Text-to-Speech script is not assigned.");
         }
+
+        isProcessing = false; // Unlock new prompts after response is complete
     }
+
 
     // Method to log the final response to a txt file
     private void LogToFile(string logEntry)
