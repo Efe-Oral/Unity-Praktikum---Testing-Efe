@@ -9,8 +9,10 @@ public class SpeechRecognitionEfe : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI inputField;  // 🔵 Assign in Unity Inspector
 
-    [SerializeField] private AudioClip startSound;  // 🎵 Sound for when recognition starts
-    [SerializeField] private AudioClip endSound;    // 🎵 Sound for when recognition ends
+    [SerializeField] private AudioClip startSound;  // Sound for when recognition starts
+    [SerializeField] private AudioClip endSound;    // Sound for when recognition ends
+    [SerializeField] private AudioClip buzzSound;   // Buzz sound when input is blocked
+
     private AudioSource audioSource;
 
     private static string speechKey = "DuTF9airVdsZZpxpgaQBj0TgJbQtkxGW22Cwrb014SyboVhXoziOJQQJ99BCACPV0roXJ3w3AAAYACOGBSBH";
@@ -38,13 +40,25 @@ public class SpeechRecognitionEfe : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))  // 🔴 Press "Space" to activate speech recognition
+        if (Input.GetKeyDown(KeyCode.Space))
         {
+            // 🔴 Only block input if a response is actively being processed
+            if (ollamaClient != null && ollamaClient.isProcessing)
+            {
+                Debug.Log("CANT PRESS SPACE BUTTON ⚠️ Speech recognition disabled: Waiting for the current response to finish.");
+                PlaySound(buzzSound);
+                return; // Stop execution
+            }
+
+            // ✅ If no prompt is being processed, allow speech recognition
             Debug.Log("🎤 Space key pressed! Starting speech recognition...");
             PlaySound(startSound);  // 🔊 Play start sound
             _ = RecognizeSpeechAsync();
         }
     }
+
+
+
 
     private async Task RecognizeSpeechAsync()
     {
@@ -74,11 +88,6 @@ public class SpeechRecognitionEfe : MonoBehaviour
             // 🔴 Trigger conversation in OllamaAPIClient
             if (ollamaClient != null)
             {
-                if (ollamaClient.isProcessing)
-                {
-                    Debug.Log("⚠️ A response is still being processed. Please wait.");
-                    return;
-                }
                 Debug.Log("💬 Starting conversation with recognized speech...");
                 ollamaClient.StartConversation();
             }

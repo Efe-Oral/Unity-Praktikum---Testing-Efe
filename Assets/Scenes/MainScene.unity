@@ -1572,6 +1572,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputField: {fileID: 1917708967}
   typeWriterEffect: {fileID: 1390662831}
+  isProcessing: 0
   userPrompt: write me a short knock knock joke?
   textToSpeech: {fileID: 10273177}
   whichModel: 0
@@ -1799,6 +1800,7 @@ MonoBehaviour:
   inputField: {fileID: 1917708967}
   startSound: {fileID: 8300000, guid: 14a47208265ee5c4aa85acfd52eb0f07, type: 3}
   endSound: {fileID: 8300000, guid: a4c692bc61024ee47908e8e38c8f8fab, type: 3}
+  buzzSound: {fileID: 8300000, guid: edf1a2284a9ccf8498093439eb2f0568, type: 3}
 --- !u!4 &1516173261
 Transform:
   m_ObjectHideFlags: 0
