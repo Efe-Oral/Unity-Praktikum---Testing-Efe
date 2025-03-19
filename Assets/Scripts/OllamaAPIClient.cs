@@ -11,7 +11,7 @@ public class OllamaAPIClient : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI inputField; // TextMeshPro InputField for user input
     [SerializeField] private TextMeshProUGUI typeWriterEffect; // UI TextMeshPro for the typewriter effect
-    private bool isProcessing = false; // Flag to track if a request is in progress
+    public bool isProcessing = false; // Flag to track if a request is in progress
     private bool stopProcess = false; // Flag to track if the process should stop
 
     [SerializeField] public string userPrompt;

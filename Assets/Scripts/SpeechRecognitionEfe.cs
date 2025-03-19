@@ -5,7 +5,7 @@ using TMPro;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 
-public class SpeechRecognition : MonoBehaviour
+public class SpeechRecognitionEfe : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI inputField;  // 🔵 Assign in Unity Inspector
 
@@ -74,6 +74,11 @@ public class SpeechRecognition : MonoBehaviour
             // 🔴 Trigger conversation in OllamaAPIClient
             if (ollamaClient != null)
             {
+                if (ollamaClient.isProcessing)
+                {
+                    Debug.Log("⚠️ A response is still being processed. Please wait.");
+                    return;
+                }
                 Debug.Log("💬 Starting conversation with recognized speech...");
                 ollamaClient.StartConversation();
             }
