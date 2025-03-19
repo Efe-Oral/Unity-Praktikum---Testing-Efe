@@ -5,42 +5,38 @@ using UnityEngine;
 public class TestingTextToSpeech : MonoBehaviour
 {
     private string input;
+    private AudioSource audioSource; // Declare audio source at class level
 
-    // Start is called before the first frame update
     void Start()
     {
-        ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing the audio clip to see if its working
-    }
+        //ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing at the beginning to see if audio clip is working
+        // Initialize the AudioSource component
+        audioSource = GetComponent<AudioSource>();
 
-    // Update is called once per frame
-    void Update()
-    {
+        // If there's no AudioSource, add one dynamically
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            Debug.Log("No AudioSource found! Added one dynamically.");
+        }
     }
 
     async Task StartAsync(string input)
     {
-
-        var api = new ElevenLabs.ElevenLabsClient("sk_0bb620868c6f0780f8e6b78ad2981ebc29abdb00036c7edf");
+        var api = new ElevenLabs.ElevenLabsClient("sk_0d477f5af3dbc339e3d12f10d7117618eb21c4bb034333e3");
         //Testing API Key:          sk_aa4c68a93ac207564f8c3372555a2a86645190cfbe4aa346
         // Unity Praktikum API Key: sk_0bb620868c6f0780f8e6b78ad2981ebc29abdb00036c7edf
-        // Sevi's API:              sk_0d477f5af3dbc339e3d12f10d7117618eb21c4bb034333e3 ✅✅✅ working API
-
+        // Sevi's API:              sk_0d477f5af3dbc339e3d12f10d7117618eb21c4bb034333e3 ✅✅✅ working APIc7edf");
         var text = input;
         var voices = await api.VoicesEndpoint.GetAllVoicesAsync();
-        var neuerValue = 5; // Select the first voice in the list
+        var neuerValue = 5;
         var Stimme = voices[neuerValue];
         Debug.Log($"Selected voice: {Stimme.Name}");
 
         var defaultVoiceSettings = await api.VoicesEndpoint.GetDefaultVoiceSettingsAsync();
-
-        // Fetch the text-to-speech response
         var voiceClip = await api.TextToSpeechEndpoint.TextToSpeechAsync(text, Stimme, defaultVoiceSettings);
+        AudioClip audioClip = await voiceClip.LoadCachedAudioClipAsync();
 
-        // Debug the voiceClip object to see available properties
-        Debug.Log($"VoiceClip object: {JsonUtility.ToJson(voiceClip)}");
-
-        // Load the audio clip explicitly
-        AudioClip audioClip = await voiceClip.LoadCachedAudioClipAsync(); // Load the audio clip
         if (audioClip == null)
         {
             Debug.LogError("Failed to load AudioClip from VoiceClip.");
@@ -49,13 +45,12 @@ public class TestingTextToSpeech : MonoBehaviour
 
         Debug.Log("Task starts TTS");
 
-        // Play the audio clip
-        AudioSource audio = GetComponent<AudioSource>();
-        if (audio != null)
+        // Play the audio clip using the class-level audioSource
+        if (audioSource != null)
         {
-            audio.clip = audioClip;
-            audio.Stop();
-            audio.Play();
+            audioSource.clip = audioClip;
+            audioSource.Stop();
+            audioSource.Play();
             Debug.Log("Playing TTS audio...");
         }
         else
@@ -67,8 +62,20 @@ public class TestingTextToSpeech : MonoBehaviour
     public void ReadInputStringAndPlay(string s)
     {
         input = s;
-
         Debug.Log("Starting Task");
         Task task = StartAsync(input);
+    }
+
+    public void StopProcess()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log("TTS playback stopped.");
+        }
+        else
+        {
+            Debug.Log("No active TTS to stop.");
+        }
     }
 }

@@ -120,6 +120,12 @@ public class OllamaAPIClient : MonoBehaviour
 
         while (!request.isDone)
         {
+            if (stopProcess)
+            {
+                Debug.Log("FOOOO Process stopped by user. Aborting request.");
+                request.Abort(); // Stop network request
+                yield break; // Exit the coroutine immediately
+            }
             // Read the streamed response incrementally
             string accumulatedData = request.downloadHandler.text;
 
@@ -174,7 +180,12 @@ public class OllamaAPIClient : MonoBehaviour
     // Callback to process the full response after streaming is done
     private void ProcessStreamedResponse(string fullResponse)
     {
-        if (stopProcess) return; // If stopped, do nothing
+        if (stopProcess) // If stopped, do nothing
+        {
+            Debug.Log("Process stopped. Ignoring final response.");
+            isProcessing = false; // Unlock new prompt entry
+            return;
+        }
 
         Debug.Log("Final Full Response: " + fullResponse.Trim());
         LogToFile($"Prompt: {userPrompt}\nFinal Response: {fullResponse.Trim()}");
@@ -196,6 +207,36 @@ public class OllamaAPIClient : MonoBehaviour
 
         isProcessing = false; // Unlock new prompts after response is complete
     }
+
+    public void StopProcess()
+    {
+        if (!isProcessing)
+        {
+            Debug.Log("No active process to stop.");
+            return;
+        }
+
+        stopProcess = true; // Stop processing new data from API
+        isProcessing = false; // Unlock prompt entry
+
+        Debug.Log("Process stopped by user.");
+        typeWriterEffect.text = "X Process stopped by user! X"; // Update UI
+
+        if (conversationHistory.Count > 0)
+        {
+            conversationHistory.RemoveAt(conversationHistory.Count - 1); // Remove last user prompt
+        }
+
+        Debug.Log("Cleared last prompt to prevent response continuation.");
+
+        // Stop TTS if it's currently playing
+        if (textToSpeech != null)
+        {
+            textToSpeech.StopProcess();
+        }
+    }
+
+
 
 
     // Method to log the final response to a txt file
