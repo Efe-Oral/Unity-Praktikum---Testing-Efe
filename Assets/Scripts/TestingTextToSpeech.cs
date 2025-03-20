@@ -9,7 +9,7 @@ public class TestingTextToSpeech : MonoBehaviour
 
     void Start()
     {
-        //ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing at the beginning to see if audio clip is working
+        ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing at the beginning to see if audio clip is working
         // Initialize the AudioSource component
         audioSource = GetComponent<AudioSource>();
 
