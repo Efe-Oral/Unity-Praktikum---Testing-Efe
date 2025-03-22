@@ -5,15 +5,15 @@ using UnityEngine;
 public class TestingTextToSpeech : MonoBehaviour
 {
     private string input;
-    private AudioSource audioSource; // Declare audio source at class level
+    private AudioSource audioSource;
 
     void Start()
     {
         ReadInputStringAndPlay("Hello world. Testing from Würzburg wassup?"); // Testing at the beginning to see if audio clip is working
-        // Initialize the AudioSource component
+        // init  the component
         audioSource = GetComponent<AudioSource>();
 
-        // If there's no AudioSource, add one dynamically
+        // If there's no AudioSource, add one 
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -45,7 +45,7 @@ public class TestingTextToSpeech : MonoBehaviour
 
         Debug.Log("Task starts TTS");
 
-        // Play the audio clip using the class-level audioSource
+        // Play the audio clip 
         if (audioSource != null)
         {
             audioSource.clip = audioClip;

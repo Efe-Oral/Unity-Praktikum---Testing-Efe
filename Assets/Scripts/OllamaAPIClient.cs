@@ -9,10 +9,10 @@ using System;
 
 public class OllamaAPIClient : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI inputField; // TextMeshPro InputField for user input
-    [SerializeField] private TextMeshProUGUI typeWriterEffect; // UI TextMeshPro for the typewriter effect
-    public bool isProcessing = false; // Flag to track if a request is in progress
-    private bool stopProcess = false; // Flag to track if the process should stop
+    [SerializeField] private TextMeshProUGUI inputField; // Prompt input for typing
+    [SerializeField] private TextMeshProUGUI typeWriterEffect; // UI effect
+    public bool isProcessing = false;
+    private bool stopProcess = false;
 
     [SerializeField] public string userPrompt;
 
@@ -40,7 +40,7 @@ public class OllamaAPIClient : MonoBehaviour
 
         public OllamaRequest(ModelEnum selectedModel, string prompt, bool stream)
         {
-            this.model = GetModelName(selectedModel); // Convert enum to correct model name
+            this.model = GetModelName(selectedModel); // Convert to correct model name
             this.prompt = prompt;
             this.stream = stream;
         }
@@ -61,13 +61,13 @@ public class OllamaAPIClient : MonoBehaviour
     // Function to start the conversation with the current input from the InputField
     public void StartConversation()
     {
-        if (isProcessing) // Prevent new prompts while a response is ongoing
+        if (isProcessing) // Prevent new prompts while processing the responce
         {
             Debug.Log("Previous response is still being processed. Please wait...");
             return;
         }
 
-        stopProcess = false; // Reset stop flag when starting a new conversation
+        stopProcess = false; // Allow for new prompt
         isProcessing = true; // Lock new requests until the current one is complete
 
         userPrompt = inputField.text + ". Give a very short answer."; // For testing purposes only!
@@ -77,7 +77,7 @@ public class OllamaAPIClient : MonoBehaviour
             return;
         }
 
-        // Append new user input to conversation history
+        // Add new user input to conversation history
         conversationHistory.Add("User: " + userPrompt);
         if (conversationHistory.Count > maxHistory)
         {
@@ -89,23 +89,23 @@ public class OllamaAPIClient : MonoBehaviour
         StartCoroutine(SendToOllama(fullContext, ProcessStreamedResponse));
     }
 
-    // Coroutine to send a POST request to Ollama's API with the user's input
+    // Send a POST request to Ollama's API with the user input
     private IEnumerator SendToOllama(string userInput, Action<string> callback)
     {
         // Get the selected model as a correctly formatted string
         string selectedModel = GetModelName(whichModel);
 
-        // Create an instance of the request payload class
+        // Create an instance of the request 
         OllamaRequest requestData = new OllamaRequest(whichModel, userInput, true); // Enable streaming
         Debug.Log("Used model is: " + selectedModel);
 
-        // Serialize the request data to JSON
+        // JSON request
         string jsonData = JsonUtility.ToJson(requestData);
 
         // Log the JSON payload to verify it's correct
         Debug.Log("Sending JSON payload: " + jsonData);
 
-        // Set up the UnityWebRequest
+        // Unity Web Request
         UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -122,9 +122,9 @@ public class OllamaAPIClient : MonoBehaviour
         {
             if (stopProcess)
             {
-                Debug.Log("FOOOO Process stopped by user. Aborting request.");
+                Debug.Log("Process stopped by user. Aborting request!");
                 request.Abort(); // Stop network request
-                yield break; // Exit the coroutine immediately
+                yield break; // Exit
             }
             // Read the streamed response incrementally
             string accumulatedData = request.downloadHandler.text;
@@ -177,13 +177,13 @@ public class OllamaAPIClient : MonoBehaviour
         }
     }
 
-    // Callback to process the full response after streaming is done
+    // Process response after streaming is done
     private void ProcessStreamedResponse(string fullResponse)
     {
         if (stopProcess) // If stopped, do nothing
         {
             Debug.Log("Process stopped. Ignoring final response.");
-            isProcessing = false; // Unlock new prompt entry
+            isProcessing = false; // Allow new prompt 
             return;
         }
 
@@ -205,7 +205,7 @@ public class OllamaAPIClient : MonoBehaviour
             Debug.Log("Text-to-Speech script is not assigned.");
         }
 
-        isProcessing = false; // Unlock new prompts after response is complete
+        isProcessing = false; // Allow new prompts after response is complete
     }
 
     public void StopProcess()
@@ -217,14 +217,14 @@ public class OllamaAPIClient : MonoBehaviour
         }
 
         stopProcess = true; // Stop processing new data from API
-        isProcessing = false; // Unlock prompt entry
+        isProcessing = false; // Allow  prompt entry
 
         Debug.Log("Process stopped by user.");
-        typeWriterEffect.text = "X Process stopped by user! X"; // Update UI
+        typeWriterEffect.text = "X Process stopped by user! X"; // Updateing UI
 
         if (conversationHistory.Count > 0)
         {
-            conversationHistory.RemoveAt(conversationHistory.Count - 1); // Remove last user prompt
+            conversationHistory.RemoveAt(conversationHistory.Count - 1); // Remove last user prompt if process is stopped
         }
 
         Debug.Log("Cleared last prompt to prevent response continuation.");
@@ -259,7 +259,7 @@ public class OllamaAPIClient : MonoBehaviour
             Debug.LogError("Failed to log to file: " + e.Message);
         }
     }
-    // Get the correct model name based on the selected enum
+    // Get the correct model name based on the selection
     private static string GetModelName(ModelEnum selectedModel)
     {
         switch (selectedModel)
@@ -277,7 +277,7 @@ public class OllamaAPIClient : MonoBehaviour
             case ModelEnum.Granite3:
                 return "granite3-moe";
             default:
-                return "gemma"; // Default model is deepseek
+                return "llama3"; // Default model is llama3
         }
     }
 }
