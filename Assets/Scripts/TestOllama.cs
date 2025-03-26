@@ -8,7 +8,7 @@ public class TestOllama : MonoBehaviour
 
     void Start()
     {
-        // Call the StartConversation method without passing any arguments
+        // Initial start call
         ollamaAPIClient.StartConversation();
     }
 }

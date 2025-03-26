@@ -38,7 +38,7 @@ public class OllamaAPIClient : MonoBehaviour
         public string prompt;
         public bool stream;
 
-        public OllamaRequest(ModelEnum selectedModel, string prompt, bool stream)
+        public OllamaRequest(ModelEnum selectedModel, string prompt, bool stream) // stream is true or false
         {
             this.model = GetModelName(selectedModel); // Convert to correct model name
             this.prompt = prompt;
@@ -47,7 +47,7 @@ public class OllamaAPIClient : MonoBehaviour
     }
 
     [System.Serializable]
-    public class StreamedChunk
+    public class StreamedChunk // Response send back from the LLM, it recives the response until bool "done" = true which is the end of the answer sentence
     {
         public string model;
         public string response; // The actual text content
@@ -56,7 +56,7 @@ public class OllamaAPIClient : MonoBehaviour
 
     private string apiUrl = "http://localhost:11434/api/generate"; // URL for the local Ollama API
     private List<string> conversationHistory = new List<string>();
-    private const int maxHistory = 5;
+    private const int maxHistory = 5; // Max logged chat history
 
     // Function to start the conversation with the current input from the InputField
     public void StartConversation()
@@ -81,12 +81,12 @@ public class OllamaAPIClient : MonoBehaviour
         conversationHistory.Add("User: " + userPrompt);
         if (conversationHistory.Count > maxHistory)
         {
-            conversationHistory.RemoveAt(0);
+            conversationHistory.RemoveAt(0); // Remove the first sent messeage
         }
 
-        string fullContext = string.Join("\n", conversationHistory);
+        string fullContext = string.Join("\n", conversationHistory); // Combining  all stored messages into one multi-line string
         // Debug.Log("Prompt sent: " + userPrompt); // Debug to confirm prompt is sent
-        StartCoroutine(SendToOllama(fullContext, ProcessStreamedResponse));
+        StartCoroutine(SendToOllama(fullContext, ProcessStreamedResponse)); // fullContext = prev messages, processedresponce = new message
     }
 
     // Send a POST request to Ollama's API with the user input
@@ -96,16 +96,18 @@ public class OllamaAPIClient : MonoBehaviour
         string selectedModel = GetModelName(whichModel);
 
         // Create an instance of the request 
-        OllamaRequest requestData = new OllamaRequest(whichModel, userInput, true); // Enable streaming
+        OllamaRequest requestData = new OllamaRequest(whichModel, userInput, true); // Enable streaming "true"
         Debug.Log("Used model is: " + selectedModel);
 
         // JSON request
         string jsonData = JsonUtility.ToJson(requestData);
+        // For example a JSON request might look like;
+        //{"model":"llama3","prompt":"Hello","stream":true}
 
         // Log the JSON payload to verify it's correct
         Debug.Log("Sending JSON payload: " + jsonData);
 
-        // Unity Web Request
+        // Unity Web Request sends the JSON to Ollama API
         UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -115,8 +117,8 @@ public class OllamaAPIClient : MonoBehaviour
         // Send the request
         request.SendWebRequest();
 
-        string fullResponse = ""; // Holds the full progressive response
-        int lastProcessedIndex = 0; // Tracks the last processed character index
+        string fullResponse = ""; // Holds the full progressive response chunks
+        int lastProcessedIndex = 0; // 	Keeps track of how much of the responce has been read so far
 
         while (!request.isDone)
         {
@@ -126,8 +128,8 @@ public class OllamaAPIClient : MonoBehaviour
                 request.Abort(); // Stop network request
                 yield break; // Exit
             }
-            // Read the streamed response incrementally
-            string accumulatedData = request.downloadHandler.text;
+
+            string accumulatedData = request.downloadHandler.text;  // Gets all the text received so far from the LLM
 
             // Extract only the new unprocessed part
             if (accumulatedData.Length > lastProcessedIndex)
@@ -136,8 +138,8 @@ public class OllamaAPIClient : MonoBehaviour
                 lastProcessedIndex = accumulatedData.Length; // Update the index tracker
 
                 // Process each JSON object in the new data
-                string[] jsonObjects = newData.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string jsonObject in jsonObjects)
+                string[] jsonObjects = newData.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries); // Each LLM response is a JSON object per line.
+                foreach (string jsonObject in jsonObjects) // Lookin thorugh each recieved JSON chunks
                 {
                     try
                     {
