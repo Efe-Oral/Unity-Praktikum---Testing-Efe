@@ -23,12 +23,12 @@ public class TestingTextToSpeech : MonoBehaviour
 
     async Task StartAsync(string input)
     {
-        var api = new ElevenLabs.ElevenLabsClient("sk_db3d8a9a858dd8c82a76501dd054efbe6e4e4212c1eda54f");
+        var api = new ElevenLabs.ElevenLabsClient("sk_7e9d7a3627b7adafddf59ab33a75f03f0b5ae07bcdf84800");
         //Testing API Key:          sk_aa4c68a93ac207564f8c3372555a2a86645190cfbe4aa346
         // Unity Praktikum API Key: sk_0bb620868c6f0780f8e6b78ad2981ebc29abdb00036c7edf
         // Sevi's API:              sk_0d477f5af3dbc339e3d12f10d7117618eb21c4bb034333e3
-
-        //New temp API: sk_db3d8a9a858dd8c82a76501dd054efbe6e4e4212c1eda54f ✅✅✅ working
+        //New temp API: sk_db3d8a9a858dd8c82a76501dd054efbe6e4e4212c1eda54f 
+        //New temp API: sk_7e9d7a3627b7adafddf59ab33a75f03f0b5ae07bcdf84800 // Restricted key, allowed only Text to Speech, Voices (read), Voices (write)
         var text = input;
         var voices = await api.VoicesEndpoint.GetAllVoicesAsync();
         var neuerValue = 5;
