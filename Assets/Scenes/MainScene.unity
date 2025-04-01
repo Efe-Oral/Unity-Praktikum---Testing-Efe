@@ -264,6 +264,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18340fb5ae90df445b3514ab68397295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioSaver: {fileID: 453679354}
 --- !u!1 &173304322
 GameObject:
   m_ObjectHideFlags: 0
@@ -667,6 +668,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 336498023}
   m_CullTransparentMesh: 1
+--- !u!1 &453679353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 453679355}
+  - component: {fileID: 453679354}
+  m_Layer: 0
+  m_Name: ElevenLabsAudioSaver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &453679354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453679353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c948ab9642d0cff47be845e7c9ab1832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetAudioSource: {fileID: 10273176}
+  apiKey: sk_69f1014b5da7d42cb4b36ebb64454ae8f764bc8c990fe145
+  voiceId: 5Q0t7uMcjvnagumLfvZi
+--- !u!4 &453679355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453679353}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -28.36592, y: -3.0678835, z: -1.1302749}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &518751323
 GameObject:
   m_ObjectHideFlags: 0
@@ -2056,7 +2104,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: who is walt disney?
+  m_text: can u tell me a knock knock joke?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eef0dac1b5360394a89ad0b0c51718d3, type: 2}
   m_sharedMaterial: {fileID: -8927641949779697358, guid: eef0dac1b5360394a89ad0b0c51718d3, type: 2}

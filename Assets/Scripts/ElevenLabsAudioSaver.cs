@@ -4,15 +4,17 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Collections;
+
 
 public class ElevenLabsAudioSaver : MonoBehaviour
 {
-    [Header("ElevenLabs Settings")]
-    [Tooltip("Your ElevenLabs API key")]
-    public string apiKey = "sk_0e626ff89cbc9cc9f829affe7dbc9ab1c466b6dcc832be89";
-    //New sevi elevenlabs account API key: sk_0e626ff89cbc9cc9f829affe7dbc9ab1c466b6dcc832be89
+    [Header("Assign AudioClip to This AudioSource")]
+    public AudioSource targetAudioSource;
 
-    [Tooltip("Voice ID to use")]
+    [Header("ElevenLabs Settings")]
+    public string apiKey = "sk_69f1014b5da7d42cb4b36ebb64454ae8f764bc8c990fe145";
+    //New sevi elevenlabs account API key: sk_0e626ff89cbc9cc9f829affe7dbc9ab1c466b6dcc832be89
     public string voiceId = "5Q0t7uMcjvnagumLfvZi";
 
     [ContextMenu("Test Save Audio")]
@@ -59,6 +61,7 @@ public class ElevenLabsAudioSaver : MonoBehaviour
 
                 File.WriteAllBytes(filePath, request.downloadHandler.data);
                 Debug.Log($"MP3 saved to: {filePath}");
+                StartCoroutine(LoadMp3AndAssignToAudioSource(filePath));
             }
             else
             {
@@ -67,4 +70,26 @@ public class ElevenLabsAudioSaver : MonoBehaviour
             }
         }
     }
+    private IEnumerator LoadMp3AndAssignToAudioSource(string filePath)
+    {
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + filePath, AudioType.MPEG))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                if (targetAudioSource != null)
+                {
+                    targetAudioSource.clip = clip;
+                    Debug.Log("MP3 loaded and assigned to AudioSource!");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to load MP3: " + www.error);
+            }
+        }
+    }
+
 }
