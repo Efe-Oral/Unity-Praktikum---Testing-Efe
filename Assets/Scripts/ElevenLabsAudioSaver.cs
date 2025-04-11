@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 
-
 public class ElevenLabsAudioSaver : MonoBehaviour
 {
     [Header("Assign AudioClip to This AudioSource")]
@@ -15,12 +14,27 @@ public class ElevenLabsAudioSaver : MonoBehaviour
     [Header("ElevenLabs Settings")]
     public string apiKey = "sk_69f1014b5da7d42cb4b36ebb64454ae8f764bc8c990fe145";
     //New sevi elevenlabs account API key: sk_0e626ff89cbc9cc9f829affe7dbc9ab1c466b6dcc832be89
-    public string voiceId = "5Q0t7uMcjvnagumLfvZi";
+    public string voiceId = "EXAVITQu4vr4xnSDxMaL"; // 5Q0t7uMcjvnagumLfvZi
 
     [ContextMenu("Test Save Audio")]
     public void TestSaveAudio()
     {
         _ = SaveAudioToDesktop("Hello from Unity! This is a test.");
+    }
+
+    [Serializable]
+    private class VoiceSettings
+    {
+        public float stability = 0.5f;
+        public float similarity_boost = 0.5f;
+    }
+
+    [Serializable]
+    private class TTSRequest
+    {
+        public string text;
+        public string model_id = "eleven_monolingual_v1";
+        public VoiceSettings voice_settings = new VoiceSettings();
     }
 
     public async Task SaveAudioToDesktop(string text, string filenamePrefix = "tts")
@@ -33,7 +47,8 @@ public class ElevenLabsAudioSaver : MonoBehaviour
 
         string url = $"https://api.elevenlabs.io/v1/text-to-speech/{voiceId}";
 
-        string json = "{\"text\":\"" + text + "\",\"model_id\":\"eleven_monolingual_v1\",\"voice_settings\":{\"stability\":0.5,\"similarity_boost\":0.5}}";
+        TTSRequest payload = new TTSRequest { text = text };
+        string json = JsonUtility.ToJson(payload);
 
         using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
@@ -60,19 +75,22 @@ public class ElevenLabsAudioSaver : MonoBehaviour
                 string filePath = Path.Combine(folderPath, fileName);
 
                 File.WriteAllBytes(filePath, request.downloadHandler.data);
-                Debug.Log($"MP3 saved to: {filePath}");
-                StartCoroutine(LoadMp3AndAssignToAudioSource(filePath));
+                Debug.Log($"Audio saved to: {filePath}");
+
+                StartCoroutine(LoadAndAssignAudioClip(filePath));
             }
             else
             {
-                Debug.LogError("Failed to download MP3: " + request.error);
+                Debug.LogError("Failed to download audio: " + request.error);
                 Debug.LogError(request.downloadHandler.text);
             }
         }
     }
-    private IEnumerator LoadMp3AndAssignToAudioSource(string filePath)
+
+    private IEnumerator LoadAndAssignAudioClip(string filePath)
     {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + filePath, AudioType.MPEG))
+        string uri = "file://" + filePath;
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(uri, AudioType.MPEG))
         {
             yield return www.SendWebRequest();
 
@@ -82,14 +100,14 @@ public class ElevenLabsAudioSaver : MonoBehaviour
                 if (targetAudioSource != null)
                 {
                     targetAudioSource.clip = clip;
-                    Debug.Log("MP3 loaded and assigned to AudioSource!");
+                    targetAudioSource.Play(); // Optional: auto-play to test
+                    Debug.Log("AudioClip loaded and assigned!");
                 }
             }
             else
             {
-                Debug.LogError("Failed to load MP3: " + www.error);
+                Debug.LogError("Failed to load AudioClip: " + www.error);
             }
         }
     }
-
 }
