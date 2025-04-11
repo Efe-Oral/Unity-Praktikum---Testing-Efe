@@ -53,7 +53,7 @@ public class TestingTextToSpeech : MonoBehaviour
         {
             audioSource.clip = audioClip;
             audioSource.Stop();
-            audioSource.Play();
+            //audioSource.Play();
             Debug.Log("Playing TTS audio...");
         }
         else
